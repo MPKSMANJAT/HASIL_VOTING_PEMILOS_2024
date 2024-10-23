@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagram Batang Hasil Pengguna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-image: url('bg.jpg');
+            /* Ganti dengan URL gambar Anda */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Arial', sans-serif;
+            color: #000;
+            /* Ubah warna teks menjadi hitam */
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            border: 2px solid #fff;
+            /* Garis tepi pada judul */
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .btn-back {
+            display: block;
+            margin: 20px auto;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .navbar {
+            background-color: #007bff;
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: #fff !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Data Pengguna</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Hasil Pengguna</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="chart.html">Diagram Batang</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <h2>Diagram Batang Hasil Pengguna</h2>
+    <canvas id="myChart" width="400" height="200" text-color="white"></canvas>
+    <button class="btn-back" onclick="window.location.href='index.html'">Kembali</button>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxVWHc_6-efcWrzcX_TY3B5zDLITrBksgU4atV3XP_JGQp8SEdvCsJPMt06b9QnpU8O/exec';
+
+        fetch(scriptURL)
+            .then(response => response.json())
+            .then(data => {
+                let counts = [0, 0, 0]; // Index 0: Foto 1, Index 1: Foto 2, Index 2: Foto 3
+                data.forEach(row => {
+                    counts[0] += parseInt(row[1]) || 0; // Count Foto 1
+                    counts[1] += parseInt(row[2]) || 0; // Count Foto 2
+                    counts[2] += parseInt(row[3]) || 0; // Count Foto 3
+                });
+
+                const totalClicks = counts.reduce((a, b) => a + b, 0); // Total klik untuk semua foto
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Suara paslon 1', 'Suara paslon 2', 'Suara paslon 3'],
+                        datasets: [{
+                            label: 'Jumlah Suara',
+                            data: counts,
+                            backgroundColor: [
+                                'rgba(193, 30, 20, 0.8)', // Warna untuk Foto 1
+                                'rgba(14, 44, 143, 0.8)', // Warna untuk Foto 2
+                                'rgba(7, 94, 5, 0.8)'  // Warna untuk Foto 3
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return value + ' (' + ((value / totalClicks) * 100).toFixed(2) + '%)'; // Tampilkan persentase
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+
+</html>
