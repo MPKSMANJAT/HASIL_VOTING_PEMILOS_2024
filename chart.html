@@ -11,21 +11,20 @@
     <style>
         body {
             background-image: url('bg.jpg');
-            /* Ganti dengan URL gambar Anda */
             background-size: cover;
             background-position: center;
             font-family: 'Arial', sans-serif;
-            color: #000;
-            /* Ubah warna teks menjadi hitam */
+            color: white;
             padding: 20px;
+            background-position-y: -1150px;
         }
 
         h2 {
             text-align: center;
             margin-bottom: 20px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             border: 2px solid #fff;
-            /* Garis tepi pada judul */
             padding: 10px;
             border-radius: 8px;
         }
@@ -42,6 +41,7 @@
         }
 
         .navbar {
+            border-radius: 8px;
             background-color: #007bff;
         }
 
@@ -49,33 +49,65 @@
         .nav-link {
             color: #fff !important;
         }
+
+        .stats-container {
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Latar belakang hitam transparan */
+            padding: 10px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            color: white; /* Warna teks */
+            text-shadow: 
+                1px 1px 0 black, /* Outline atas kanan */
+                -1px -1px 0 black, /* Outline bawah kiri */
+                1px -1px 0 black, /* Outline atas kiri */
+                -1px 1px 0 black; /* Outline bawah kanan */
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .stat {
+            text-align: center;
+            margin: 0 50px;
+        }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Data Pengguna</a>
+            <a class="navbar-brand" href="#">Hasil Suara Seluruh TPS</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item, border">
                         <a class="nav-link" href="index.html">Hasil Pengguna</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="chart.html">Diagram Batang</a>
+                    <li class="nav-item, border">
+                        <a class="nav-link" href="chart.html">Diagram Batang</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <h2>Diagram Batang Hasil Pengguna</h2>
-    <canvas id="myChart" width="400" height="200" text-color="white"></canvas>
+    <h2>Diagram Suara Seluruh TPS</h2>
+
+    <div class="stats-container">
+        <div class="stats" id="statsContainer">
+            <!-- Jumlah dan Persentase akan ditambahkan di sini -->
+        </div>
+    </div>
+
+    <canvas id="myChart" width="400" height="200"></canvas>
     <button class="btn-back" onclick="window.location.href='index.html'">Kembali</button>
 
     <script>
@@ -92,19 +124,20 @@
                 });
 
                 const totalClicks = counts.reduce((a, b) => a + b, 0); // Total klik untuk semua foto
+                const percentages = counts.map(count => ((count / totalClicks) * 100).toFixed(2));
 
                 const ctx = document.getElementById('myChart').getContext('2d');
                 const myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['Suara paslon 1', 'Suara paslon 2', 'Suara paslon 3'],
+                        labels: ['Suara Paslon 1', 'Suara Paslon 2', 'Suara Paslon 3'], // Ubah teks jika diperlukan
                         datasets: [{
                             label: 'Jumlah Suara',
                             data: counts,
                             backgroundColor: [
-                                'rgba(193, 30, 20, 0.8)', // Warna untuk Foto 1
-                                'rgba(14, 44, 143, 0.8)', // Warna untuk Foto 2
-                                'rgba(7, 94, 5, 0.8)'  // Warna untuk Foto 3
+                                'rgba(193, 30, 20, 0.8)',
+                                'rgba(14, 44, 143, 0.8)',
+                                'rgba(7, 94, 5, 0.8)'
                             ],
                             borderColor: [
                                 'rgba(255, 99, 132, 1)',
@@ -115,17 +148,51 @@
                         }]
                     },
                     options: {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: 'white', // Warna teks legend
+                                    font: {
+                                        size: 16 // Ukuran teks legend
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                bodyColor: 'white', // Warna teks tooltip
+                                titleColor: 'white', // Warna judul tooltip
+                            }
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 ticks: {
+                                    color: 'white', // Warna angka sumbu Y
                                     callback: function (value) {
-                                        return value + ' (' + ((value / totalClicks) * 100).toFixed(2) + '%)'; // Tampilkan persentase
+                                        return value + ' (' + ((value / totalClicks) * 100).toFixed(2) + '%)';
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: 'black', // Warna teks sumbu X
+
+                                    font: {
+                                        size: 24 // Ukuran teks sumbu X
                                     }
                                 }
                             }
                         }
                     }
+                });
+
+
+                // Menampilkan jumlah suara dan persentase
+                const statsContainer = document.getElementById('statsContainer');
+                counts.forEach((count, index) => {
+                    const statDiv = document.createElement('div');
+                    statDiv.classList.add('stat');
+                    statDiv.innerHTML = `<strong>Paslon ${index + 1}</strong><br>${count} suara<br>${percentages[index]}%`;
+                    statsContainer.appendChild(statDiv);
                 });
             })
             .catch(error => console.error('Error fetching data:', error));
